@@ -1,3 +1,5 @@
+// BY ME - IF ERROR CHANGE MODULE TO "commonjs" AND IN TYPES [] PUT "node"
+
 {
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
@@ -35,7 +37,7 @@
     // Recommended Options
     "strict": true,
     "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
