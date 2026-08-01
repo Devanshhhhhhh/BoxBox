@@ -11,3 +11,9 @@ export const getSessions = async () => {
     const data = await response.json();
     return data;
 }
+
+export const getMeetings = async () => {
+    const response = await fetch(`${OPENF1_URL}/meetings`)
+    const data = await response.json();
+    return data;
+}

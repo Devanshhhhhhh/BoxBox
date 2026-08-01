@@ -3,6 +3,7 @@ import healthRoutes from "./routes/health.routes";
 import greetUser from "./routes/greet.routes";
 import driverRoutes from "./routes/driver.routes";
 import sessionRoute from "./routes/session.routes";
+import meetingRoute from "./routes/meeting.routes";
 
 const app = express();
 app.use(express.json());
@@ -13,6 +14,8 @@ app.use("/api/greet", greetUser);
 
 app.use("/api/drivers", driverRoutes);
 
-app.use("/api/session", sessionRoute)
+app.use("/api/sessions", sessionRoute);
+
+app.use("/api/meetings", meetingRoute);
 
 export default app;
