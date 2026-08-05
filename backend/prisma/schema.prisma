@@ -22,3 +22,41 @@ model Driver {
 
   @@map("drivers")
 }
+
+
+model Meeting {
+  id Int @id @default(autoincrement())
+  meetingKey Int @unique
+  meetingName String
+  officialName String?
+
+  countryCode String?
+  countryName String
+  location String
+
+  circuitShortName String
+  circuitImage String?
+
+  dateStart DateTime
+  dateEnd DateTime?
+
+  year Int
+
+  sessions Session[]
+
+  @@map("meetings")
+}
+
+model Session {
+  id Int @id @default(autoincrement())
+  sessionKey Int @unique
+  sessionName String
+  sessionType String
+  dateStart DateTime
+  dateEnd DateTime?
+
+  meetingId Int
+  meeting Meeting @relation(fields: [meetingId], references: [id])
+
+  @@map("sessions")
+}
