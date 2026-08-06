@@ -1,14 +1,11 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
-import { getDrivers } from "../services/openf1.service";
-import { getMeetings } from "../services/openf1.service";
+import { getDrivers, getMeetings, getSessions } from "../services/openf1.service";
 
 // SYNCHRONIZE DRIVERS
 export const syncDrivers = async (req: Request, res: Response) => {
     const drivers = await getDrivers();
     let processed = 0;
-    let created = 0;
-    let updated = 0;
 
     for(const driver of drivers){
         await prisma.driver.upsert({
@@ -81,6 +78,53 @@ export const syncMeetings = async (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         message: "Meetings synchronized successfully",
+        processed: processed
+    })
+}
+
+// SYNCHRONIZE SESSIONS(specific race type(sprint, FP1))
+
+export const syncSessions = async (req: Request, res: Response) => {
+    const sessions = await getSessions();
+    let processed = 0;
+
+    for(const session of sessions){
+        const meeting = await prisma.meeting.findUnique({
+            where: {
+                meetingKey: session.meeting_key
+            }
+        })
+
+        if(!meeting) {     // No meeting exist, skip upsert
+            continue;
+        }
+
+        await prisma.session.upsert({
+            where: {
+                sessionKey: session.session_key
+            },
+            update: {
+                sessionName: session.session_name,
+                sessionType: session.session_type,
+                dateStart: new Date(session.date_start),
+                dateEnd: new Date(session.date_end),
+                meetingId: meeting.id
+            },
+            create: {
+                sessionKey: session.session_key,
+                sessionName: session.session_name,
+                sessionType: session.session_type,
+                dateStart: new Date(session.date_start),
+                dateEnd: new Date(session.date_end),
+                meetingId: meeting.id
+            }
+        })
+        processed++;
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Sessions synchronized successfully",
         processed: processed
     })
 }
