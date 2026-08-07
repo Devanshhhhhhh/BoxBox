@@ -17,3 +17,23 @@ export const getMeetings = async () => {
     const data = await response.json();
     return data;
 }
+
+export const getSessionResults = async (sessionKey: number) => {
+    const response = await fetch(`${OPENF1_URL}/session_result?session_key=${sessionKey}`)
+    
+    console.log(
+        sessionKey,
+        response.status
+    );
+
+    if(!response.ok){
+
+        console.log(
+            `No result available for session ${sessionKey}`
+        );
+
+        return [];
+    }
+
+    return response.json();
+}

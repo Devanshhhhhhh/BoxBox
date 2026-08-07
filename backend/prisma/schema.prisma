@@ -13,6 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// DRIVER
 model Driver {
   id           Int     @id @default(autoincrement())
   driverNumber Int     @unique
@@ -20,10 +21,12 @@ model Driver {
   teamName     String?
   countryCode  String?
 
+  results Result[]
+
   @@map("drivers")
 }
 
-
+// MEETING
 model Meeting {
   id Int @id @default(autoincrement())
   meetingKey Int @unique
@@ -47,6 +50,7 @@ model Meeting {
   @@map("meetings")
 }
 
+// SESSION
 model Session {
   id Int @id @default(autoincrement())
   sessionKey Int @unique
@@ -58,5 +62,30 @@ model Session {
   meetingId Int
   meeting Meeting @relation(fields: [meetingId], references: [id])
 
+  results Result[]
+
   @@map("sessions")
+}
+
+// RESULT
+model Result {
+  id Int @id @default(autoincrement())
+
+  position Int?
+  duration Json?
+  gapToLeader Json?
+  numberOfLaps Int?
+
+  dnf Boolean
+  dns Boolean
+  dsq Boolean
+
+  driverId Int
+  sessionId Int
+
+  driver Driver @relation(fields: [driverId], references: [id])
+  session Session @relation(fields: [sessionId], references: [id])
+
+  @@unique([driverId, sessionId])
+  @@map("results")
 }

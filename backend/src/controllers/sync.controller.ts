@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
-import { getDrivers, getMeetings, getSessions } from "../services/openf1.service";
+import { getDrivers, getMeetings, getSessions, getSessionResults } from "../services/openf1.service";
 
 // SYNCHRONIZE DRIVERS
 export const syncDrivers = async (req: Request, res: Response) => {
     const drivers = await getDrivers();
     let processed = 0;
 
-    for(const driver of drivers){
+    for (const driver of drivers) {
         await prisma.driver.upsert({
             where: {
                 driverNumber: driver.driver_number
@@ -18,7 +18,7 @@ export const syncDrivers = async (req: Request, res: Response) => {
                 countryCode: driver.country_code
             },
             create: {
-                driverNumber : driver.driver_number,
+                driverNumber: driver.driver_number,
                 fullName: driver.full_name,
                 teamName: driver.team_name,
                 countryCode: driver.country_code
@@ -26,7 +26,7 @@ export const syncDrivers = async (req: Request, res: Response) => {
         })
         processed++;
     }
-    
+
     res.status(200).json({
         success: true,
         message: "Driver synchronized succesfully",
@@ -41,7 +41,7 @@ export const syncMeetings = async (req: Request, res: Response) => {
     // console.log(meetings[0]);
     let processed = 0;
 
-    for(const meeting of meetings){
+    for (const meeting of meetings) {
         await prisma.meeting.upsert({
             where: {
                 meetingKey: meeting.meeting_key
@@ -88,14 +88,14 @@ export const syncSessions = async (req: Request, res: Response) => {
     const sessions = await getSessions();
     let processed = 0;
 
-    for(const session of sessions){
+    for (const session of sessions) {
         const meeting = await prisma.meeting.findUnique({
             where: {
                 meetingKey: session.meeting_key
             }
         })
 
-        if(!meeting) {     // No meeting exist, skip upsert
+        if (!meeting) {     // No meeting exist, skip upsert
             continue;
         }
 
@@ -125,6 +125,64 @@ export const syncSessions = async (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         message: "Sessions synchronized successfully",
+        processed: processed
+    })
+}
+
+// SYNCHRONIZE RESULTS
+export const syncResults = async (req: Request, res: Response) => {
+    const sessions = await prisma.session.findMany();
+    let processed = 0;
+
+    for (const session of sessions) {
+        const results = await getSessionResults(session.sessionKey);
+        console.log(results);
+        for (const result of results) {
+            const driver = await prisma.driver.findUnique({
+                where: {
+                    driverNumber: result.driver_number
+                }
+            })
+
+            if (!driver) {
+                continue;
+            }
+
+            await prisma.result.upsert({
+                where: {
+                    driverId_sessionId: {
+                        driverId: driver.id,
+                        sessionId: session.id
+                    }
+                },
+                update: {
+                    position: result.position ?? null,
+                    duration: result.duration ?? null,
+                    gapToLeader: result.gap_to_leader ?? null,
+                    numberOfLaps: result.number_of_laps ?? null,
+                    dnf: result.dnf ?? false,
+                    dns: result.dns ?? false,
+                    dsq: result.dsq ?? false
+                },
+                create: {
+                    position: result.position ?? null,
+                    duration: result.duration ?? null,
+                    gapToLeader: result.gap_to_leader ?? null,
+                    numberOfLaps: result.number_of_laps ?? null,
+                    dnf: result.dnf ?? false,
+                    dns: result.dns ?? false,
+                    dsq: result.dsq ?? false,
+                    driverId: driver.id,
+                    sessionId: session.id
+                }
+            })
+
+            processed++;
+        }
+    }
+    res.status(200).json({
+        success: true,
+        message: "Results synchronized successfully",
         processed: processed
     })
 }

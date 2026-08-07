@@ -1,5 +1,5 @@
-import { getMeetings } from "../services/openf1.service";
 import { Request, Response } from "express";
+import { getMeetings } from "../services/openf1.service";
 
 const getAllMeetings = async (req: Request, res: Response) => {
     const meetings = await getMeetings();
