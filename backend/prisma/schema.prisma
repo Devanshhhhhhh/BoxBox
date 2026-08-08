@@ -22,6 +22,7 @@ model Driver {
   countryCode  String?
 
   results Result[]
+  laps Lap[]
 
   @@map("drivers")
 }
@@ -63,6 +64,7 @@ model Session {
   meeting Meeting @relation(fields: [meetingId], references: [id])
 
   results Result[]
+  laps Lap[]
 
   @@map("sessions")
 }
@@ -88,4 +90,28 @@ model Result {
 
   @@unique([driverId, sessionId])
   @@map("results")
+}
+
+// LAP
+model Lap {
+  id Int @id @default(autoincrement())
+
+  dateStart DateTime?
+  
+  durationSector1 Float?
+  durationSector2 Float?
+  durationSector3 Float?
+
+  isPitOutLap Boolean
+  lapDuration Float
+  lapNumber Int
+
+  sessionId Int
+  driverId Int
+
+  driver Driver @relation(fields: [driverId], references: [id])
+  session Session @relation(fields: [sessionId], references: [id])
+
+  @@unique([driverId, sessionId, lapNumber])
+  @@map("laps")
 }
