@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
-import { getDrivers, getMeetings, getSessions, getSessionResults } from "../services/openf1.service";
+import { getDrivers, getMeetings, getSessions, getSessionResults, getLaps } from "../services/openf1.service";
 
 // SYNCHRONIZE DRIVERS
 export const syncDrivers = async (req: Request, res: Response) => {
@@ -183,6 +183,78 @@ export const syncResults = async (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         message: "Results synchronized successfully",
+        processed: processed
+    })
+}
+
+
+// SYNC LAPS
+export const syncLaps = async (req: Request, res: Response) => {
+    const sessions = await prisma.session.findMany();
+
+    let processed = 0;
+
+    for(const session of sessions){
+        let laps;
+
+        try{
+            laps = await getLaps(session.sessionKey);
+
+        } catch(error){
+            console.log(`No laps available for session ${session.sessionKey}`)
+            continue;
+        }
+
+        for(const lap of laps){
+            const driver = await prisma.driver.findUnique({
+                where: {
+                    driverNumber : lap.driver_number
+                }
+            })
+
+            if(!driver){
+                continue;
+            }
+
+            await prisma.lap.upsert({
+                where: {
+                    driverId_sessionId_lapNumber: {
+                        driverId: driver.id,
+                        sessionId: session.id,
+                        lapNumber: lap.lap_number
+                    }
+                },
+                update: {
+                    dateStart: lap.date_start,
+
+                    durationSector1: lap.duration_sector_1 ?? null,
+                    durationSector2: lap.duration_sector_2 ?? null,
+                    durationSector3: lap.duration_sector_3 ?? null,
+
+                    isPitOutLap: lap.is_pit_out_lap,
+                    lapDuration: lap.lap_duration ?? null,
+                },
+                create: {
+                    dateStart: lap.date_start,
+
+                    durationSector1: lap.duration_sector_1 ?? null,
+                    durationSector2: lap.duration_sector_2 ?? null,
+                    durationSector3: lap.duration_sector_3 ?? null,
+
+                    isPitOutLap: lap.is_pit_out_lap,
+                    lapDuration: lap.lap_duration ?? null,
+                    lapNumber: lap.lap_number,
+
+                    driver: { connect: { id: driver.id } },
+                    session: { connect: { id: session.id } }
+                }
+            })
+            processed++;
+        }
+    }
+    res.status(200).json({
+        success: true,
+        message: "Laps synchronized successfully",
         processed: processed
     })
 }

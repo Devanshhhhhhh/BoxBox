@@ -103,7 +103,7 @@ model Lap {
   durationSector3 Float?
 
   isPitOutLap Boolean
-  lapDuration Float
+  lapDuration Float?
   lapNumber Int
 
   sessionId Int
