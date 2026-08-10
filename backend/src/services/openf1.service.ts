@@ -52,3 +52,14 @@ export const getLaps = async (sessionKey : number) => {
 
     return data;
 }
+
+
+export const getPits = async (sessionKey: number) => {
+    const response = await fetch(`${OPENF1_URL}/pit?session_key=${sessionKey}`)
+
+    if(!response.ok){
+        throw new Error(`OpenF1 failed for session ${sessionKey}`)
+    }
+
+    return response.json();
+}

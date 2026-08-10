@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
-import { getDrivers, getMeetings, getSessions, getSessionResults, getLaps } from "../services/openf1.service";
+import { getDrivers, getMeetings, getSessions, getSessionResults, getLaps, getPits } from "../services/openf1.service";
 
 // SYNCHRONIZE DRIVERS
 export const syncDrivers = async (req: Request, res: Response) => {
