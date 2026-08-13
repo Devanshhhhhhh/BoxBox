@@ -24,6 +24,7 @@ model Driver {
   results Result[]
   laps Lap[]
   pits Pit[]
+  stints Stint[]
 
   @@map("drivers")
 }
@@ -67,6 +68,7 @@ model Session {
   results Result[]
   laps Lap[]
   pits Pit[]
+  stints Stint[]
 
   @@map("sessions")
 }
@@ -135,4 +137,25 @@ model Pit {
 
   @@unique([driverId, sessionId, lapNumber])
   @@map("pits")
+}
+
+model Stint {
+  id Int @id @default(autoincrement())
+
+  compound String
+  lapStart Int?
+  lapEnd Int?
+
+  stintNumber Int
+  tyreAge Int?
+
+  sessionId Int
+  driverId Int
+
+  session Session @relation(fields: [sessionId], references: [id])
+  driver Driver @relation(fields: [driverId], references: [id])
+
+  @@unique([sessionId, driverId, stintNumber])
+
+  @@map("stints")
 }
