@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
 import { getDrivers, getMeetings, getSessions, getSessionResults, getLaps, getPits } from "../services/openf1.service";
-import { connect } from "node:http2";
+import { delay } from "../utils/delay";
 
 // SYNCHRONIZE DRIVERS
 export const syncDrivers = async (req: Request, res: Response) => {
@@ -9,6 +9,7 @@ export const syncDrivers = async (req: Request, res: Response) => {
     let processed = 0;
 
     for (const driver of drivers) {
+        await delay(2200);
         await prisma.driver.upsert({
             where: {
                 driverNumber: driver.driver_number
@@ -43,6 +44,7 @@ export const syncMeetings = async (req: Request, res: Response) => {
     let processed = 0;
 
     for (const meeting of meetings) {
+        await delay(2200);
         await prisma.meeting.upsert({
             where: {
                 meetingKey: meeting.meeting_key
@@ -90,6 +92,8 @@ export const syncSessions = async (req: Request, res: Response) => {
     let processed = 0;
 
     for (const session of sessions) {
+        await delay(2200);
+
         const meeting = await prisma.meeting.findUnique({
             where: {
                 meetingKey: session.meeting_key
@@ -136,6 +140,8 @@ export const syncResults = async (req: Request, res: Response) => {
     let processed = 0;
 
     for (const session of sessions) {
+        await delay(2200);
+
         const results = await getSessionResults(session.sessionKey);
         console.log(results);
         for (const result of results) {
@@ -196,6 +202,8 @@ export const syncLaps = async (req: Request, res: Response) => {
     let processed = 0;
 
     for(const session of sessions){
+        await delay(2200);
+        
         let laps;
 
         try{
@@ -266,6 +274,9 @@ export const syncPits = async (req: Request, res: Response) => {
     let processed = 0;
     
     for(const session of sessions){
+
+        await delay(2200);
+
         let pits;
         try {
             pits = await getPits(session.sessionKey);
