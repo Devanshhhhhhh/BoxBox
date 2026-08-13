@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
 import { getDrivers, getMeetings, getSessions, getSessionResults, getLaps, getPits } from "../services/openf1.service";
+import { connect } from "node:http2";
 
 // SYNCHRONIZE DRIVERS
 export const syncDrivers = async (req: Request, res: Response) => {
@@ -255,6 +256,68 @@ export const syncLaps = async (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         message: "Laps synchronized successfully",
+        processed: processed
+    })
+}
+
+// SYNC PITS
+export const syncPits = async (req: Request, res: Response) => {
+    const sessions = await prisma.session.findMany();
+    let processed = 0;
+    
+    for(const session of sessions){
+        let pits;
+        try {
+            pits = await getPits(session.sessionKey);
+        } catch(error){
+            console.log(`No laps available for session ${session.sessionKey}`)
+            continue;
+        }
+
+        for(const pit of pits){
+            const driver = await prisma.driver.findUnique({
+                where: {
+                    driverNumber: pit.driver_number
+                }
+            })
+
+            if(!driver){
+                continue;
+            }
+
+            await prisma.pit.upsert({
+                where: {
+                    driverId_sessionId_lapNumber: {
+                        driverId: driver.id,
+                        sessionId: session.id,
+                        lapNumber: pit.lap_number
+                    }
+                },
+                update: {
+                    date: new Date(pit.date),
+
+                    laneDuration: pit.lane_duration,
+                    stopDuration: pit.stop_duration,
+                },
+                create: {
+                    date: new Date(pit.date),
+
+                    lapNumber: pit.lap_number,
+                    laneDuration: pit.lane_duration,
+                    stopDuration: pit.stop_duration,
+                    
+                    driver: {connect: { id: driver.id }},
+                    session: {connect: {id: session.id}}
+                }
+            })
+            
+            processed++;
+        }
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Pits synchronized succesfully",
         processed: processed
     })
 }
