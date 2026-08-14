@@ -67,3 +67,18 @@ export const getPits = async (sessionKey: number) => {
 
     return data;
 }
+
+
+export const getStints = async (sessionKey: number) => {
+    const response = await fetch(`${OPENF1_URL}/stints?session_key=${sessionKey}`)
+    const data = await response.json();
+
+    console.log("Session:", sessionKey);
+    console.log("OpenF1 response:", data);
+
+    if(!response.ok){
+        throw new Error(`OpenF1 failed for session ${sessionKey}`)
+    }
+
+    return data;
+}

@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
-import { getDrivers, getMeetings, getSessions, getSessionResults, getLaps, getPits } from "../services/openf1.service";
+import { getDrivers, getMeetings, getSessions, getSessionResults, getLaps, getPits, getStints } from "../services/openf1.service";
 import { delay } from "../utils/delay";
+import { connect } from "node:http2";
 
 // SYNCHRONIZE DRIVERS
 export const syncDrivers = async (req: Request, res: Response) => {
@@ -329,6 +330,70 @@ export const syncPits = async (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         message: "Pits synchronized succesfully",
+        processed: processed
+    })
+}
+
+// SYNC STINTS
+export const syncStints = async (req: Request, res: Response) => {
+    const sessions = await prisma.session.findMany();
+    let processed = 0;
+
+    for(const session of sessions){
+        await delay(2200);
+
+        let stints;
+        try {
+            stints = await getStints(session.sessionKey);
+        } catch(error) {
+            console.log(`No stints available for session ${session.sessionKey}`)
+            continue;
+        }
+
+        for(const stint of stints){
+            const driver = await prisma.driver.findUnique({
+                where: {
+                    driverNumber: stint.driver_number
+                }
+            })
+
+            if(!driver){
+                continue;
+            }
+
+            await prisma.stint.upsert({
+                where: {
+                    sessionId_driverId_stintNumber: {
+                        driverId: driver.id,
+                        sessionId: session.id,
+                        stintNumber: stint.stint_number
+                    }
+                },
+                update: {
+                    compound: stint.compound,
+                    lapStart: stint.lap_start,
+                    lapEnd: stint.lap_end,
+                    stintNumber: stint.stint_number,
+                    tyreAge: stint.tyre_age
+                },
+                create: {
+                    compound: stint.compound,
+                    lapStart: stint.lap_start,
+                    lapEnd: stint.lap_end,
+                    stintNumber: stint.stint_number,
+                    tyreAge: stint.tyre_age,
+
+                    driver: {connect: { id: driver.id }},
+                    session: {connect: {id: session.id}}
+                }
+            })
+            processed++;
+        }
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Stints synchronized successfully",
         processed: processed
     })
 }

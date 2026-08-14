@@ -142,7 +142,7 @@ model Pit {
 model Stint {
   id Int @id @default(autoincrement())
 
-  compound String
+  compound String?
   lapStart Int?
   lapEnd Int?
 
