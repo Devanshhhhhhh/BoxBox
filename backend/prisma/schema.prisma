@@ -69,6 +69,7 @@ model Session {
   laps Lap[]
   pits Pit[]
   stints Stint[]
+  weathers Weather[]
 
   @@map("sessions")
 }
@@ -158,4 +159,28 @@ model Stint {
   @@unique([sessionId, driverId, stintNumber])
 
   @@map("stints")
+}
+
+model Weather {
+  id Int @id @default(autoincrement())
+
+  airTemperature Float?
+  trackTemperature Float?
+
+  date DateTime?
+
+  humidity Int?
+  pressure Float?
+  rainfall Int?
+
+  windDirection Int?
+  windSpeed Float?
+
+  sessionId Int
+
+  session Session @relation(fields: [sessionId], references: [id])
+
+  @@unique([sessionId, date])
+
+  @@map("weathers")
 }

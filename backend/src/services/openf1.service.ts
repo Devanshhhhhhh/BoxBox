@@ -82,3 +82,17 @@ export const getStints = async (sessionKey: number) => {
 
     return data;
 }
+
+export const getWeather = async (sessionKey: number) => {
+    const response = await fetch(`${OPENF1_URL}/weather?session_key=${sessionKey}`);
+    const data = await response.json();
+
+    console.log("Session:", sessionKey);
+    console.log("OpenF1 response:", data)
+
+    if(!response.ok){
+        throw new Error(`OpenF1 failed for session ${sessionKey}`)
+    }
+
+    return data;
+}

@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { syncDrivers, syncMeetings, syncSessions, syncResults, syncLaps, syncPits, syncStints} from "../controllers/sync.controller"
+import { syncDrivers, syncMeetings, syncSessions, syncResults, syncLaps, syncPits, syncStints, syncWeather} from "../controllers/sync.controller"
 
 const router = Router();
 
@@ -16,5 +16,7 @@ router.post("/laps", syncLaps);
 router.post("/pits", syncPits);
 
 router.post("/stints", syncStints);
+
+router.post("/weathers", syncWeather);
 
 export default router;

@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
-import { getDrivers, getMeetings, getSessions, getSessionResults, getLaps, getPits, getStints } from "../services/openf1.service";
+import { getDrivers, getMeetings, getSessions, getSessionResults, getLaps, getPits, getStints, getWeather } from "../services/openf1.service";
 import { delay } from "../utils/delay";
-import { connect } from "node:http2";
 
 // SYNCHRONIZE DRIVERS
 export const syncDrivers = async (req: Request, res: Response) => {
@@ -394,6 +393,73 @@ export const syncStints = async (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         message: "Stints synchronized successfully",
+        processed: processed
+    })
+}
+
+// SYNC WEATHER
+export const syncWeather = async (req: Request, res: Response) => {
+    const sessions = await prisma.session.findMany();
+    let processed = 0;
+
+    for(const session of sessions){
+        await delay(2200);
+
+        let weatherData;
+
+        try {
+            weatherData = await getWeather(session.sessionKey)
+        } catch (error) {
+            console.log(`No weather available for session ${session.sessionKey}`)
+            continue;
+        }
+        
+        for(const weather of weatherData) {
+            await prisma.weather.upsert({
+                where: {
+                    sessionId_date: {
+                        sessionId: session.id,
+                        date: new Date(weather.date)
+                    }
+                },
+                update: {
+                    airTemperature: weather.air_temperature,
+                    trackTemperature: weather.track_temperature,
+                    
+                    humidity: weather.humidity,
+                    pressure: weather.pressure,
+                    rainfall: weather.rainfall,
+
+                    windDirection: weather.wind_direction,
+                    windSpeed: weather.wind_speed
+                },
+                create: {
+                    airTemperature: weather.air_temperature,
+                    trackTemperature: weather.track_temperature,
+                    
+                    humidity: weather.humidity,
+                    pressure: weather.pressure,
+                    rainfall: weather.rainfall,
+
+                    windDirection: weather.wind_direction,
+                    windSpeed: weather.wind_speed,
+
+                    date: new Date(weather.date),
+
+                    session: {
+                        connect: {
+                            id: session.id
+                        }
+                    }
+                }
+            })
+            processed++;
+        }
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Weather Data synchronized successfully",
         processed: processed
     })
 }
