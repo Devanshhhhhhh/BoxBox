@@ -1,10 +1,10 @@
-const Home = () => {
+export default function Home() {
   return (
-    <main>
-      <h1>BoxBox</h1>
-      <p>F1 Race Analytics</p>
-    </main>
-  )
+    <div>
+      <h1 className="text-3xl font-bold">BoxBox</h1>
+      <p className="mt-2 text-zinc-400">
+        F1 Race Analytics Dashboard
+      </p>
+    </div>
+  );
 }
-
-export default Home;
