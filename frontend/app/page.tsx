@@ -1,7 +1,26 @@
 import RaceCard from "@/components/RaceCard";
 import StatCard from "@/components/StatCard";
 
-export default function Home() {
+type Meeting = {
+  meeting_key: number;
+  meeting_name: string;
+  location: string;
+  country_name: string;
+  date_start: string;
+  year: number;
+}
+
+type MeetingsResponse = {
+  success: boolean;
+  data: Meeting[];
+}
+
+export default async function Home() {
+
+  const response = await fetch("http://localhost:5000/api/meetings")
+  const result: MeetingsResponse = await response.json();
+  const meetings = result.data;
+
   return (
     <main>
       <div>
@@ -24,10 +43,25 @@ export default function Home() {
             <p className="text-zinc-400 text-sm mt-1">Latest Formula 1 events</p>
           </div>
 
-          <div className="space-y-3">
-            <RaceCard name="Australian Grand Prix" location="Melbourne" date="15 March 2026" status="Completed" />
-            <RaceCard name="Japanese Grand Prix" location="Suzuka" date="29 March 2026" status="Completed" />
-            <RaceCard name="Miami Grand Prix" location="Miami" date="03 May 2026" status="Upcoming" />
+          <div className="space-y-4">
+            {meetings.slice(-5).map((meeting) => (
+              <RaceCard
+                key={meeting.meeting_key}
+                name={meeting.meeting_name}
+                location={meeting.location}
+                date={new Date(meeting.date_start).toLocaleDateString(
+                  "en-GB",
+                  {
+                    day:"2-digit",
+                    month:"short",
+                    year:"numeric"
+                  }
+                )}
+                status= {
+                  new Date(meeting.date_start) > new Date() ? "Upcoming" : "Completed"
+                }
+              />
+            ))}
           </div>
 
         </section>
