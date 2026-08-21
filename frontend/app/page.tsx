@@ -7,6 +7,17 @@ type Meeting = {
   location: string;
   country_name: string;
   date_start: string;
+  date_end: string;
+  year: number;
+  is_cancelled: boolean;
+}
+
+type Driver = {
+  driver_name: string
+}
+
+type Session = {
+  session_key: number;
   year: number;
 }
 
@@ -15,12 +26,43 @@ type MeetingsResponse = {
   data: Meeting[];
 }
 
+type DriversResponse = {
+  success: boolean;
+  data: Driver[];
+}
+
+type SessionsResponse = {
+  success: boolean;
+  data: Session[];
+}
+
 export default async function Home() {
 
-  const response = await fetch("http://localhost:5000/api/meetings")
-  const result: MeetingsResponse = await response.json();
-  const meetings = result.data;
+  const [meetingsResponse, driversResponse, sessionsResponse] = await Promise.all([
+    fetch("http://localhost:5000/api/meetings"),
+    fetch("http://localhost:5000/api/drivers"),
+    fetch("http://localhost:5000/api/sessions")
+  ])
 
+  const meetingsResult: MeetingsResponse = await meetingsResponse.json();
+  const driversResult: DriversResponse = await driversResponse.json();
+  const sessionsResult: SessionsResponse = await sessionsResponse.json();
+
+  
+  const meetings = meetingsResult.data;
+  const drivers = driversResult.data;
+  const sessions = sessionsResult.data;
+  
+  const currentYear = 2026;
+
+  const seasonMeetings = meetings.filter(
+    (meeting) => meeting.year === currentYear
+  );
+  
+  const seasonSessions = sessions.filter(
+    (sessions) => sessions.year === currentYear
+  );
+  
   return (
     <main>
       <div>
@@ -30,9 +72,9 @@ export default async function Home() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <StatCard title="Races" value={24}/>
-          <StatCard title="Drivers" value={22}/>
-          <StatCard title="Sessions" value={72}/>
+          <StatCard title="Races" value={seasonMeetings.length}/>
+          <StatCard title="Drivers" value={drivers.length}/>
+          <StatCard title="Sessions" value={seasonSessions.length}/>
         </div>
 
         <section className="mt-10">
@@ -44,7 +86,7 @@ export default async function Home() {
           </div>
 
           <div className="space-y-4">
-            {meetings.slice(-5).map((meeting) => (
+            {meetings.slice(-25).map((meeting) => (
               <RaceCard
                 key={meeting.meeting_key}
                 name={meeting.meeting_name}
