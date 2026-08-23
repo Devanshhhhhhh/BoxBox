@@ -2,7 +2,7 @@ type RaceCardProps = {
     name: string;
     location: string;
     date: string;
-    status: "Completed" | "Upcoming"
+    status: "Completed" | "Upcoming" | "Cancelled"
 }
 
 export default function RaceCard({
@@ -22,6 +22,8 @@ export default function RaceCard({
           className={`mt-2 inline-block rounded-full px-3 py-1 text-xs ${
             status === "Completed"
               ? "bg-green-500/10 text-green-400"
+              : status == "Cancelled"
+              ? "bg-red-500/10 text-red-400"
               : "bg-yellow-500/10 text-yellow-400"
           }`}
         >
