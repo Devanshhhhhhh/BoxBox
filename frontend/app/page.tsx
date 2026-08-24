@@ -50,7 +50,7 @@ export default async function Home() {
       <div>
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="mt-2 text-zinc-400 mb-2">Formula 1 season overview</p>
+          <p className="mt-2 text-zinc-400 mb-2">Formula 1 Overview of Season {currentYear}</p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -61,7 +61,7 @@ export default async function Home() {
 
         <section className="mt-10">
           <div className="mb-4">
-            <p className="text-xl font-semibold">Recent Races</p>
+            <p className="text-xl font-semibold">Race Calendar</p>
             <p className="text-zinc-400 text-sm mt-1">Latest Formula 1 events</p>
           </div>
 

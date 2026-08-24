@@ -47,17 +47,14 @@ export const getDashboardData = async (req: Request, res: Response) => {
                     meetingName: {
                         not: "Pre-Season Testing",
                     },
-                },
-                orderBy: {
-                    dateStart: "desc",
-                },
-                take: 5
+                }
             }),
         ]);
 
         res.status(200).json({
         success: true,
         data: {
+            currentYear,
             totalDrivers,
             totalSessions,
             totalRaces,
