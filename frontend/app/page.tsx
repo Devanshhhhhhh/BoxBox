@@ -1,5 +1,6 @@
 import RaceCard from "@/components/RaceCard";
 import StatCard from "@/components/StatCard";
+import Link from "next/link";
 
 type Meeting = {
   id: number;
@@ -62,12 +63,12 @@ export default async function Home() {
         <section className="mt-10">
           <div className="mb-4">
             <p className="text-xl font-semibold">Race Calendar</p>
-            <p className="text-zinc-400 text-sm mt-1">Latest Formula 1 events</p>
           </div>
 
           <div className="space-y-4">
             {recentRaces.map((meeting) => (
               <RaceCard
+                meetingKey={meeting.meetingKey}
                 key={meeting.meetingKey}
                 name={meeting.meetingName}
                 location={meeting.location}
