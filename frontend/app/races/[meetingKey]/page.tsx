@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type Session = {
     id: number;
     sessionKey: number;
@@ -7,29 +9,16 @@ type Session = {
     dateEnd: string;
     meetingId: number;
 }
-// "id": 78,
-//     "meetingKey": 1280,
-//     "meetingName": "Chinese Grand Prix",
-//     "officialName": null,
-//     "countryCode": "CHN",
-//     "countryName": "China",
-//     "location": "Shanghai",
-//     "circuitShortName": "Shanghai",
-//     "circuitImage": "https://media.formula1.com/content/dam/fom-website/2018-redesign-assets/Track%20icons%204x3/China%20carbon.png",
-//     "dateStart": "2026-03-13T03:30:00.000Z",
-//     "dateEnd": "2026-03-15T09:00:00.000Z",
-//     "year": 2026,
-//     "sessions": [
 
 type Race = {
     id: number;
     meetingKey: number;
     meetingName: string;
-    officialName: string;
+    officialName: string | null;
     countryCode: string;
     countryName: string;
     location: string;
-    circuitShrotName: string;
+    circuitShortName: string;
     circuitImage: string;
     dateStart: string;
     dateEnd: string;
@@ -46,16 +35,88 @@ export default async function MeetingDetails ({ params }: { params: Promise<{ me
     const { meetingKey } = await params;
 
     const response = await fetch(`http://localhost:5000/api/races/${meetingKey}`);
-    const data: MeetingDetailResponse = await response.json();
-    
-    const race = data.data;
-    return (
-        <div>
-            <h1 className="text-3xl">{race.meetingName}</h1>
 
-            {race.sessions.map((session) => (
-                <div key={session.id}> {session.sessionName} </div>
-            ))}
-        </div>
+    if(!response.ok){
+        throw new Error("Failed to fetch race details");
+    }
+    
+    const data: MeetingDetailResponse = await response.json();
+    const race = data.data;
+
+    const startDate = new Date(race.dateStart).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
+
+    const endDate = new Date(race.dateEnd).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
+    
+    return (
+        <main className="min-h-screen text-white p-6 md:p-10 max-w-6xl mx-auto space-y-6">
+            <div>
+                <Link 
+                    href={"/"}
+                    className="inline-flex items-center text-sm text-zinc-400 hover:text-white transition-colors"
+                > 
+                    ← Back to Dashboard
+                </Link>
+            </div>
+
+            <section className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8">
+                <div className="w-full md:w-1/3 flex items-center justify-center rounded-xl min-h-45">
+                    {race.circuitImage ? (
+                        <img 
+                            src={race.circuitImage} 
+                            alt={race.circuitShortName} 
+                            className="max-h-40 object-contain filter brightness-90 hover:brightness-100 transition-all"
+                        />
+                    ) : (
+                        <span className="text-xs text-zinc-500 uppercase tracking-widest"> 
+                            Circuit Layout Unavailable 
+                        </span>
+                    )}
+                </div>
+
+                <div className="w-full md:w-2/3 space-y-3">
+                    <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider bg-red-600/20 text-red-400 border border-red-500/30 rounded-full">
+                            {race.year} Season 
+                        </span>
+                        <span className="text-xs text-zinc-400">
+                            {race.countryName}
+                        </span>
+                    </div>
+
+                    <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-white">
+                        {race.meetingName}
+                    </h1>
+
+                    {race.officialName && (
+                        <p className="text-xs text-zinc-500 font-mono">
+                            {race.officialName}
+                        </p>
+                    )}
+
+                    <div className="pt-2 flex flex-wrap items-center gap-y-2 gap-x-6 text-sm text-zinc-300">
+                        <div>
+                            <span className="text-zinc-500">Circuit: </span>
+                            <span className="font-medium">{race.circuitShortName}</span>
+                        </div>
+                        <div>
+                            <span className="text-zinc-500 ">Location: </span>
+                            <span className="font-medium">{race.location} </span>
+                        </div>
+                        <div>
+                            <span className="text-zinc-500">Dates: </span>
+                            <span className="font-meduim">{startDate} — {endDate} </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
     )
 }
