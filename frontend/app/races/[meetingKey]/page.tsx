@@ -19,7 +19,7 @@ type Race = {
     countryName: string;
     location: string;
     circuitShortName: string;
-    circuitImage: string;
+    circuitImage: string | null;
     dateStart: string;
     dateEnd: string;
     year: number;
@@ -66,6 +66,7 @@ export default async function MeetingDetails ({ params }: { params: Promise<{ me
                 </Link>
             </div>
 
+            {/* RACE HEADER */}
             <section className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8">
                 <div className="w-full md:w-1/3 flex items-center justify-center rounded-xl min-h-45">
                     {race.circuitImage ? (
@@ -74,6 +75,7 @@ export default async function MeetingDetails ({ params }: { params: Promise<{ me
                             alt={race.circuitShortName} 
                             className="max-h-40 object-contain filter brightness-90 hover:brightness-100 transition-all"
                         />
+                        
                     ) : (
                         <span className="text-xs text-zinc-500 uppercase tracking-widest"> 
                             Circuit Layout Unavailable 
@@ -112,9 +114,54 @@ export default async function MeetingDetails ({ params }: { params: Promise<{ me
                         </div>
                         <div>
                             <span className="text-zinc-500">Dates: </span>
-                            <span className="font-meduim">{startDate} — {endDate} </span>
+                            <span className="font-medium">{startDate} — {endDate} </span>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            {/* WEEKEND SCHEDULE */}
+            <section>
+                <div className="mb-4">
+                    <h2 className="text-xl font-mono font-semibold uppercase">Weekend Schedule</h2>
+                </div>
+                <div className="space-y-3 ">
+                    {race.sessions.map((session) => {
+                        const sessionStartDate = new Date(session.dateStart).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric"
+                        })
+
+                        const startTime = new Date(session.dateStart).toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false
+                        })
+
+                        const endTime = new Date(session.dateEnd).toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false
+                        })
+                        
+                        let sessionColorClasses = "";
+
+                        if (session.sessionType === "Practice") {
+                            sessionColorClasses = "border-blue-500/50 bg-blue-500/10 hover:border-blue-400 text-blue-400";
+                        } else if (session.sessionType === "Qualifying") {
+                                sessionColorClasses = "border-yellow-500/50 bg-yellow-500/10 hover:border-yellow-400 text-yellow-400";
+                        } else if (session.sessionType === "Race") {
+                            sessionColorClasses = "border-red-500/50 bg-red-500/10 hover:border-red-400 text-red-400";
+                        }
+                        
+                        return (
+                            <div key={session.sessionKey} className={`rounded-xl border p-5 transition-colors ${sessionColorClasses}`}>
+                                <p className="font-semibold text-white font-mono"> {session.sessionName} </p>
+                                <p className="mt-1 text-sm text-zinc-400 font-mono">{sessionStartDate} · {startTime } — {endTime}</p>
+                            </div>
+                        )
+                    })}
                 </div>
             </section>
         </main>
