@@ -45,6 +45,7 @@ model Meeting {
 
   dateStart DateTime
   dateEnd DateTime?
+  isCancelled       Boolean   @default(false)
 
   year Int
 

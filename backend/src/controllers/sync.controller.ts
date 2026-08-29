@@ -40,10 +40,16 @@ export const syncDrivers = async (req: Request, res: Response) => {
 // SYNCHRONIZE METTINGS(GP)
 export const syncMeetings = async (req: Request, res: Response) => {
     const meetings = await getMeetings();
-    // console.log(meetings[0]);
+
+    const meetings2026 = meetings.filter(
+        (meeting: { year: number }) => meeting.year === 2026
+    );
+
+    console.log(meetings2026);
+
     let processed = 0;
 
-    for (const meeting of meetings) {
+    for (const meeting of meetings2026) {
         await delay(2200);
         await prisma.meeting.upsert({
             where: {
@@ -59,7 +65,8 @@ export const syncMeetings = async (req: Request, res: Response) => {
                 circuitImage: meeting.circuit_image,
                 dateStart: new Date(meeting.date_start),
                 dateEnd: new Date(meeting.date_end),
-                year: meeting.year
+                year: meeting.year,
+                isCancelled: meeting.is_cancelled
             },
             create: {
                 meetingKey: meeting.meeting_key,
@@ -72,7 +79,8 @@ export const syncMeetings = async (req: Request, res: Response) => {
                 circuitImage: meeting.circuit_image,
                 dateStart: new Date(meeting.date_start),
                 dateEnd: new Date(meeting.date_end),
-                year: meeting.year
+                year: meeting.year,
+                isCancelled: meeting.is_cancelled
             }
         })
         processed++;
