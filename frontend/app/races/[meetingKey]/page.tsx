@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 type Session = {
     id: number;
@@ -30,6 +31,20 @@ type MeetingDetailResponse = {
     success: boolean;
     data: Race;
 }
+
+type Result = {
+    position: number,
+    driver: string,
+    team: string,
+    gapToLeader: number,
+    status: string
+}
+
+type ResultsResponse = {
+    success: boolean,
+    data: Result[];
+}
+
                               // property extracted  //property  // property type
 export default async function MeetingDetails ({ params }: { params: Promise<{ meetingKey: string}>; }) {
     const { meetingKey } = await params;
@@ -54,7 +69,16 @@ export default async function MeetingDetails ({ params }: { params: Promise<{ me
         month: "short",
         year: "numeric"
     });
-    
+
+    const raceSession = race?.sessions.find(
+        (session) => session.sessionType === "Race"
+    )
+
+    const resultsResponse = await fetch(`http://localhost:5000/api/results/${raceSession?.sessionKey}`)
+    const raceResult: ResultsResponse = await resultsResponse.json();
+
+    console.log(raceResult.data);
+
     return (
         <main className="min-h-screen text-white p-6 md:p-10 max-w-6xl mx-auto space-y-6">
             <div>

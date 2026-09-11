@@ -12,6 +12,7 @@ type Meeting = {
   dateEnd: string;
   year: number;
   isCancelled: boolean;
+  is_cancelled: boolean;
   meetingOfficialName: string | null;
 };
 

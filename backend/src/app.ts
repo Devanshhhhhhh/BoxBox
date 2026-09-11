@@ -5,6 +5,7 @@ import meetingRoute from "./routes/meeting.routes";
 import syncRoutes from "./routes/sync.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import raceRoutes from "./routes/race.routes";
+import resultRoutes from "./routes/result.routes";
 
 const app = express();
 app.use(express.json());
@@ -20,5 +21,7 @@ app.use("/api/sync", syncRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 app.use("/api/races", raceRoutes);
+
+app.use("/api/results", resultRoutes);
 
 export default app;
