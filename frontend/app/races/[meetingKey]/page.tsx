@@ -70,14 +70,21 @@ export default async function MeetingDetails ({ params }: { params: Promise<{ me
         year: "numeric"
     });
 
+    console.log("1 - page loaded");
+
     const raceSession = race?.sessions.find(
-        (session) => session.sessionType === "Race"
+        (session) => session.sessionName === "Race"
     )
 
+    console.log("2 - race session:", raceSession);
+
     const resultsResponse = await fetch(`http://localhost:5000/api/results/${raceSession?.sessionKey}`)
+
+    console.log("3 - response:", resultsResponse.status);
+
     const raceResult: ResultsResponse = await resultsResponse.json();
 
-    console.log(raceResult.data);
+    console.log("4 - results:", raceResult.data);
 
     return (
         <main className="min-h-screen text-white p-6 md:p-10 max-w-6xl mx-auto space-y-6">
@@ -186,6 +193,65 @@ export default async function MeetingDetails ({ params }: { params: Promise<{ me
                             </div>
                         )
                     })}
+                </div>
+            </section>
+
+            {/* Race Result */}
+            <section className="mt-10">
+                <h2 className="text-xl font-semibold text-white font-mono">
+                    Race Results
+                </h2>
+
+                <div className="mt-4 overflow-hidden rounded-xl border border-zinc-800">
+                    <table className="w-full text-left">
+                        <thead className="bg-zinc-900">
+                            <tr>
+                                <th className="px-5 py-4 text-sm font-medium text-zinc-400 font-mono">
+                                    Pos
+                                </th>
+                                <th className="px-5 py-4 text-sm font-medium text-zinc-400 font-mono">
+                                    Driver
+                                </th>
+                                <th className="px-5 py-4 text-sm font-medium text-zinc-400 font-mono">
+                                    Team
+                                </th>
+                                <th className="px-5 py-4 text-sm font-medium text-zinc-400 font-mono">
+                                    Gap
+                                </th>
+                                <th className="px-5 py-4 text-sm font-medium text-zinc-400 font-mono">
+                                    Status
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody className="divide-y divide-zinc-800">
+                            {raceResult.data.map((result) => (
+                            <tr key={result.driver} className="bg-zinc-950">
+                                <td className="px-5 py-4 text-white font-mono">
+                                {result.position}
+                                </td>
+
+                                <td className="px-5 py-4 text-white font-mono font-semibold">
+                                {result.driver}
+                                </td>
+
+                                <td className="px-5 py-4 text-zinc-400 font-mono">
+                                {result.team}
+                                </td>
+
+                                <td className="px-5 py-4 text-zinc-400 font-mono">
+                                {result.position === 1
+                                    ? "—"
+                                    : `+${result.gapToLeader}s`}
+                                </td>
+
+                                <td className="px-5 py-4 text-zinc-400 font-mono">
+                                {result.status}
+                                </td>
+                            </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </section>
         </main>

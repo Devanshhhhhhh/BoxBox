@@ -144,15 +144,22 @@ export const syncSessions = async (req: Request, res: Response) => {
 
 // SYNCHRONIZE RESULTS
 export const syncResults = async (req: Request, res: Response) => {
-    const sessions = await prisma.session.findMany();
+    const sessions = await prisma.session.findMany({
+        where: {
+            meeting: {
+                year: 2026
+            }
+        }
+    });
     let processed = 0;
 
     for (const session of sessions) {
         await delay(2200);
-
+        
         const results = await getSessionResults(session.sessionKey);
         console.log(results);
         for (const result of results) {
+            console.log(result);
             const driver = await prisma.driver.findUnique({
                 where: {
                     driverNumber: result.driver_number
