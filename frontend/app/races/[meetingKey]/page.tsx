@@ -226,6 +226,7 @@ export default async function MeetingDetails ({ params }: { params: Promise<{ me
 
                         <tbody className="divide-y divide-zinc-800">
                             {raceResult.data.map((result) => (
+                                
                             <tr key={result.driver} className="bg-zinc-950">
                                 <td className="px-5 py-4 text-white font-mono">
                                 {result.position}

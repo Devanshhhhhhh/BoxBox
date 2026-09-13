@@ -12,13 +12,6 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          href="/races"
-          className="rounded-md px-4 py-3 text-zinc-400 hover:bg-zinc-800 hover:text-white"
-        >
-          Races
-        </Link>
-
-        <Link
           href="/drivers"
           className="rounded-md px-4 py-3 text-zinc-400 hover:bg-zinc-800 hover:text-white"
         >
