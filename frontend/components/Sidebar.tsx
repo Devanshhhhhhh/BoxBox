@@ -15,7 +15,7 @@ export default function Sidebar() {
           href="/drivers"
           className="rounded-md px-4 py-3 text-zinc-400 hover:bg-zinc-800 hover:text-white"
         >
-          Drivers
+          Drivers Standings
         </Link>
       </nav>
     </aside>

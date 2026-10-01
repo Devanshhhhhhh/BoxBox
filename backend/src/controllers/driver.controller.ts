@@ -6,8 +6,9 @@ import { getLatestRaceSession, getChampionshipDrivers } from "../services/sessio
 // GET DRIVER
 const getAllDrivers = async (req: Request, res: Response) => {
     const drivers = await prisma.driver.findMany();
-
+    
     // Get latest session for drivers standings
+
     const session = await getLatestRaceSession(2026);
     console.log(session);
 
