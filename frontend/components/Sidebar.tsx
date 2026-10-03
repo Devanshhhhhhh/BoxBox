@@ -8,7 +8,7 @@ export default function Sidebar() {
           href="/"
           className="rounded-md px-4 py-3 text-zinc-400 hover:bg-zinc-800 hover:text-white"
         >
-          Dashboard
+          This Season
         </Link>
 
         <Link

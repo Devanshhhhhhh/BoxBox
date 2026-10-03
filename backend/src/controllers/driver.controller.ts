@@ -10,7 +10,6 @@ const getAllDrivers = async (req: Request, res: Response) => {
     // Get latest session for drivers standings
 
     const session = await getLatestRaceSession(2026);
-    console.log(session);
 
     //Get data of the session for drivers standings
     const driversStandings = await getChampionshipDrivers(Number(session?.sessionKey));
