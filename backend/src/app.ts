@@ -6,6 +6,7 @@ import syncRoutes from "./routes/sync.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import raceRoutes from "./routes/race.routes";
 import resultRoutes from "./routes/result.routes";
+import replayRoutes from "./routes/replay.routes";
 
 const app = express();
 app.use(express.json());
@@ -23,5 +24,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/races", raceRoutes);
 
 app.use("/api/results", resultRoutes);
+
+app.use("/api/replay", replayRoutes);
 
 export default app;
