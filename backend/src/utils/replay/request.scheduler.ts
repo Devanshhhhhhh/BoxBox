@@ -1,7 +1,39 @@
 import { delay } from "../delay";
 
-const REQUEST_INTERVAL_MS = 500;
+// controls the order
+let requestQueue: Promise<void> = Promise.resolve();
 
+
+const REQUEST_INTERVAL_MS = 500;
+let lastRequestTime = 0;
+
+// Request spacer
+const waitForRequestSlot = async () => {
+    const elapsed = Date.now() - lastRequestTime;
+    const remaining = REQUEST_INTERVAL_MS - elapsed;
+
+    if(remaining > 0){
+        await delay(remaining);
+    }
+
+    lastRequestTime = Date.now();
+}
+
+const scheduleRequest = async <T>(task: () => Promise<T>): Promise<T> => {
+    const currentRequest =  requestQueue.then(async () => {
+        await waitForRequestSlot();
+        return task();
+    })
+
+    requestQueue = currentRequest.then(
+        () => undefined,
+        () => undefined
+    );
+
+    return currentRequest;
+}
+
+// performs the actual request and handle it
 export const runSequentially = async <T>(tasks:(() => Promise<T>)[]) => {
     const results: T[] = [];
     const maximumRetries = 3;
