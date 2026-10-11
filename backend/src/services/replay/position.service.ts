@@ -1,4 +1,5 @@
 import { OpenF1Error } from "../../utils/replay/openf1-error";
+import { scheduleRequest } from "../../utils/replay/request.scheduler";
 
 type PositionData = {
     date: string;
@@ -10,13 +11,19 @@ type PositionData = {
 
 export const getPositionData = async (sessionKey: number): Promise<PositionData[]> => {
     const url = `https://api.openf1.org/v1/position?session_key=${sessionKey}`
-    const response = await fetch(url);
 
-    if(!response.ok){
-        throw new OpenF1Error(`OpenF1 position request failed: ${response.status}`, response.status)
-    }
+    return scheduleRequest(async () => {
+        const response = await fetch(url);
 
-    const data: PositionData[] = await response.json();
+        if (!response.ok) {
+            throw new OpenF1Error(
+                `OpenF1 position request failed: ${response.status}`,
+                response.status
+            );
+        }
 
-    return data;
+        const data: PositionData[] = await response.json();
+
+        return data;
+    });
 }
