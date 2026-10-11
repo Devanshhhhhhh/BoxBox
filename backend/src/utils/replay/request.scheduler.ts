@@ -42,7 +42,7 @@ export const runSequentially = async <T>(tasks:(() => Promise<T>)[]) => {
         let retries = 0;
         while(true){
             try {
-                const result = await task();
+                const result = await scheduleRequest(task);
                 results.push(result);
                 break;
             }

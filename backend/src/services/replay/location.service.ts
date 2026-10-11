@@ -1,3 +1,5 @@
+import { OpenF1Error } from "../../utils/replay/openf1-error";
+
 type LocationData = {
     date: string;
     session_key: number;
@@ -6,16 +8,6 @@ type LocationData = {
     x: number;
     z: number;
     y: number;
-}
-
-class OpenF1Error extends Error {
-    status: number;
-
-    constructor(message: string, status: number){
-        super(message);
-        this.status = status;
-        this.name = "OpenF1Error"
-    }
 }
 
 export const getLocationChunk = async (sessionKey: number, startTime: string, endTime: string): Promise<LocationData[]>=> {
