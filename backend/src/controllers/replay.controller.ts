@@ -20,54 +20,7 @@ const getValidSessionKey = (value: string): number | null => {
     return sessionKey;
 };
 
-
 // LOCATION CONTROLLER
-/* export const getLocationChunkController = async (req: Request, res: Response) => {
-    const sessionKey = Number(req.params.sessionKey);
-    const {start, end} = req.query;
-
-    if (!Number.isInteger(sessionKey) || sessionKey <= 0 || typeof start !== "string" || typeof end !== "string") {
-        return res.status(400).json({
-            success: false,
-            message: "A valid sessionKey, start, and end query parameters are required"
-        });
-    }
-
-    try{
-        const timeChunks = createTimeChunks(start, end, 5);
-
-        const tasks = timeChunks.map(({start: chunkStart, end: chunkEnd}) => 
-            () => getLocationChunk(sessionKey, chunkStart, chunkEnd)
-        )
-        const locationDataChunks = await runSequentially(tasks);
-        const locationData = locationDataChunks.flat();
-
-        return res.status(200).json({
-            success: true,
-            data: locationData
-        })
-    } catch(error){
-        if (error instanceof RangeError) {
-            return res.status(400).json({
-                success: false,
-                message: error.message
-            });
-        }
-
-        console.error("Failed to fetch replay location data", {
-            sessionKey,
-            start,
-            end,
-            error
-        });
-
-        return res.status(500).json({
-            success: false,
-            message: "Failed to fetch location data"
-        })
-    }
-} */
-
 export const getLocationChunkController = async (
     req: Request,
     res: Response
@@ -189,7 +142,7 @@ export const getLocationChunkController = async (
 
 // POSITION CONTROLLER
 export const getPositionController = async (req: Request, res: Response) => {
-
+    console.log("POSITION CONTROLLER HIT");
     const rawSessionKey = req.params.sessionKey;
     
     if (typeof rawSessionKey !== "string") {
@@ -230,6 +183,7 @@ export const getPositionController = async (req: Request, res: Response) => {
 
 // LAPS CONTROLLER
 export const getLapsController = async (req: Request,res: Response) => {
+    console.log("LAP CONTROLLER HIT");
     const rawSessionKey = req.params.sessionKey;
 
     if (typeof rawSessionKey !== "string") {
@@ -275,6 +229,7 @@ export const getPitController = async (
     req: Request,
     res: Response
 ) => {
+    console.log("PIT CONTROLLER HIT");
     const rawSessionKey = req.params.sessionKey;
 
     if (typeof rawSessionKey !== "string") {
