@@ -47,3 +47,32 @@ export const groupedRecordsbyDriver =  <T extends {driver_number: number}
     }
     return groupedRecords;
 }
+
+
+// Connecting both the functions above (timeline and records)
+export const getLatestRecordsByDriverAtTime = <T extends TimestampedRecord & {driver_number: number}  // Requirements from input data
+>(
+    recordsByDriver: Map<number, T[]>,  // Input data
+    targetTime: string,
+    lastIndices: Map<number, number>
+): Map<number, T> => {
+    const synchronizedRecords = new Map<number, T>();
+
+    for(const [driverNumber, driverRecords] of recordsByDriver){
+        const startIndex = lastIndices.get(driverNumber) ?? 0;
+
+        const { record, nextIndex } = getLatestRecordAtorBefore(
+            driverRecords,
+            targetTime,
+            startIndex
+        );
+
+        lastIndices.set(driverNumber, nextIndex);
+
+        if(record){
+            synchronizedRecords.set(driverNumber, record);
+        }
+     }
+
+     return synchronizedRecords;
+}

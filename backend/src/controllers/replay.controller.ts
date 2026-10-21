@@ -1,6 +1,5 @@
 import { Request, Response} from "express";
 import { createTimeChunks } from "../utils/replay/chunk.utils";
-import { runSequentially } from "../utils/replay/request.scheduler";
 import prisma from "../config/prisma";
 import { scheduleRequest } from "../utils/replay/request.scheduler";
 import { OpenF1Error } from "../utils/replay/openf1-error";
