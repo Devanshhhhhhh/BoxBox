@@ -76,3 +76,27 @@ export const getLatestRecordsByDriverAtTime = <T extends TimestampedRecord & {dr
 
      return synchronizedRecords;
 }
+
+
+// Outer most function that gathers all the data
+export const preparePositionReplay = <T extends TimestampedRecord & {driver_number: number}
+>(
+    positionRecords: T[],
+    targetTime: string
+): {
+    recordsByDriver: Map<number, T[]>;
+    lastIndices: Map<number, number>;
+    synchronizedRecords: Map<number, T>;
+} => {
+    
+    const recordsByDriver = groupedRecordsbyDriver(positionRecords);
+    const lastIndices = new Map<number, number>();
+
+    const synchronizedRecords = getLatestRecordsByDriverAtTime(
+        recordsByDriver,
+        targetTime,
+        lastIndices
+    )
+
+    return {recordsByDriver, lastIndices, synchronizedRecords};
+}
