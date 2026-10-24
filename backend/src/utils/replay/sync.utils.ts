@@ -100,3 +100,43 @@ export const preparePositionReplay = <T extends TimestampedRecord & {driver_numb
 
     return {recordsByDriver, lastIndices, synchronizedRecords};
 }
+
+// Resets lastIndices when user seek backwards
+export const resetReplayIndices = (
+    lastIndices: Map<number, number>
+): void => {
+    for(const driverNumber of lastIndices.keys()){
+        lastIndices.set(driverNumber, 0);
+    }
+}
+
+
+export const findLatestIndexAtOrBefore = <T extends TimestampedRecord
+>(
+    records: T[],
+    targetTime: string
+):  number => {
+    const targetTimestamp = new Date(targetTime).getTime();
+
+    let left = 0;
+    let right = records.length -1;
+    let bestIndex = -1;
+
+    while(left <= right){
+        const middle = Math.floor(left + (right - left) / 2);
+
+        const middleRecord = records[middle];
+        if(!middleRecord) break;
+        const recordTimestamp = new Date(middleRecord.date).getTime();
+
+        if(recordTimestamp <= targetTimestamp){
+            bestIndex = middle;
+            left = middle + 1;
+        }
+        else{
+            right = middle - 1;
+        }
+    }
+    return bestIndex;
+
+}

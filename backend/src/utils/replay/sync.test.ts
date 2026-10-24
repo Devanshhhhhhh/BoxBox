@@ -1,5 +1,4 @@
-import { preparePositionReplay } from "./sync.utils";
-import { getLatestRecordsByDriverAtTime } from "./sync.utils";
+import { preparePositionReplay, getLatestRecordsByDriverAtTime, resetReplayIndices, findLatestIndexAtOrBefore } from "./sync.utils";
 
 const sampleRecords = [
     {
@@ -30,25 +29,71 @@ const replay = preparePositionReplay(
 );
 
 
-const nextPositions = getLatestRecordsByDriverAtTime(
-    replay.recordsByDriver,
-    "2026-10-21T14:00:04Z",
-    replay.lastIndices
+// const nextPositions = getLatestRecordsByDriverAtTime(
+//     replay.recordsByDriver,
+//     "2026-10-21T14:00:04Z",
+//     replay.lastIndices
+// );
+
+// console.log("Positions at 14:00:04:");
+
+// for (const [driverNumber, record] of nextPositions) {
+//     console.log(`Driver ${driverNumber}: P${record.position}`);
+// }
+
+
+// console.log("Synchronized positions:");
+
+// for (const [driverNumber, record] of replay.synchronizedRecords) {
+//     console.log(
+//         `Driver ${driverNumber}: P${record.position} at ${record.date}`
+//     );
+// }
+
+// console.log("Saved indices:", replay.lastIndices);
+
+
+
+// resetReplayIndices(replay.lastIndices);
+
+// const earlierPositions = getLatestRecordsByDriverAtTime(
+//     replay.recordsByDriver,
+//     "2026-10-21T14:00:02Z",
+//     replay.lastIndices
+// );
+
+// console.log("Positions after seeking backward to 14:00:02:");
+
+// for (const [driverNumber, record] of earlierPositions) {
+//     console.log(`Driver ${driverNumber}: P${record.position}`);
+// }
+
+
+
+const driver12Records = sampleRecords.filter(
+    record => record.driver_number === 12
 );
 
-console.log("Positions at 14:00:04:");
+const driver44Records = sampleRecords.filter(
+    record => record.driver_number === 44
+);
 
-for (const [driverNumber, record] of nextPositions) {
-    console.log(`Driver ${driverNumber}: P${record.position}`);
-}
+const seekTime = "2026-10-21T14:00:02Z";
 
+console.log(
+    "Driver 12 index:",
+    findLatestIndexAtOrBefore(driver12Records, seekTime)
+);
 
-console.log("Synchronized positions:");
+console.log(
+    "Driver 44 index:",
+    findLatestIndexAtOrBefore(driver44Records, seekTime)
+);
 
-for (const [driverNumber, record] of replay.synchronizedRecords) {
-    console.log(
-        `Driver ${driverNumber}: P${record.position} at ${record.date}`
-    );
-}
-
-console.log("Saved indices:", replay.lastIndices);
+console.log(
+    "Driver 12 before race data:",
+    findLatestIndexAtOrBefore(
+        driver12Records,
+        "2026-10-21T14:00:00Z"
+    )
+);
