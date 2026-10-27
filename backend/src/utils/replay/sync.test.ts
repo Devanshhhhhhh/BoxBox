@@ -1,4 +1,4 @@
-import { preparePositionReplay, getLatestRecordsByDriverAtTime, resetReplayIndices, findLatestIndexAtOrBefore } from "./sync.utils";
+import { preparePositionReplay, getLatestRecordsByDriverAtTime, resetReplayIndices, findLatestIndexAtOrBefore, seekRecordsByDriverAtTime} from "./sync.utils";
 
 const sampleRecords = [
     {
@@ -70,30 +70,61 @@ const replay = preparePositionReplay(
 
 
 
-const driver12Records = sampleRecords.filter(
-    record => record.driver_number === 12
+// const driver12Records = sampleRecords.filter(
+//     record => record.driver_number === 12
+// );
+
+// const driver44Records = sampleRecords.filter(
+//     record => record.driver_number === 44
+// );
+
+// const seekTime = "2026-10-21T14:00:02Z";
+
+// console.log(
+//     "Driver 12 index:",
+//     findLatestIndexAtOrBefore(driver12Records, seekTime)
+// );
+
+// console.log(
+//     "Driver 44 index:",
+//     findLatestIndexAtOrBefore(driver44Records, seekTime)
+// );
+
+// console.log(
+//     "Driver 12 before race data:",
+//     findLatestIndexAtOrBefore(
+//         driver12Records,
+//         "2026-10-21T14:00:00Z"
+//     )
+// );
+
+
+// const seekedPositions = seekRecordsByDriverAtTime(
+//     replay.recordsByDriver,
+//     "2026-10-21T14:00:02Z",
+//     replay.lastIndices
+// );
+
+// console.log("Positions after seeking backward to 14:00:02:");
+
+// for (const [driverNumber, record] of seekedPositions) {
+//     console.log(`Driver ${driverNumber}: P${record.position}`);
+// }
+
+// console.log("Indices after seeking:", replay.lastIndices);
+
+
+
+const resumedPositions = getLatestRecordsByDriverAtTime(
+    replay.recordsByDriver,
+    "2026-10-21T14:00:04Z",
+    replay.lastIndices
 );
 
-const driver44Records = sampleRecords.filter(
-    record => record.driver_number === 44
-);
+console.log("Positions after resuming forward playback:");
 
-const seekTime = "2026-10-21T14:00:02Z";
+for (const [driverNumber, record] of resumedPositions) {
+    console.log(`Driver ${driverNumber}: P${record.position}`);
+}
 
-console.log(
-    "Driver 12 index:",
-    findLatestIndexAtOrBefore(driver12Records, seekTime)
-);
-
-console.log(
-    "Driver 44 index:",
-    findLatestIndexAtOrBefore(driver44Records, seekTime)
-);
-
-console.log(
-    "Driver 12 before race data:",
-    findLatestIndexAtOrBefore(
-        driver12Records,
-        "2026-10-21T14:00:00Z"
-    )
-);
+console.log("Indices after resuming:", replay.lastIndices);

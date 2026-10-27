@@ -110,7 +110,7 @@ export const resetReplayIndices = (
     }
 }
 
-
+// Find the new index after backward seeking for 1 driver
 export const findLatestIndexAtOrBefore = <T extends TimestampedRecord
 >(
     records: T[],
@@ -138,5 +138,30 @@ export const findLatestIndexAtOrBefore = <T extends TimestampedRecord
         }
     }
     return bestIndex;
+}
 
+// call findLastestIndexAtOrBefore for each driver and update replay state
+export const seekRecordsByDriverAtTime = <T extends TimestampedRecord & {driver_number: number}
+>(
+    recordsByDriver: Map<number, T[]>,
+    targetTime: string,
+    lastIndices: Map<number, number>
+): Map<number, T> => {
+    const synchronizedRecords = new Map<number, T>();
+
+    for(const [driverNumber, driverRecords] of recordsByDriver){
+        const index = findLatestIndexAtOrBefore(driverRecords, targetTime);
+        
+        lastIndices.set(driverNumber, index);
+
+        if(index >= 0){
+            const record = driverRecords[index];
+
+            if(record){
+                synchronizedRecords.set(driverNumber, record);
+            }
+        }
+    }
+    
+    return synchronizedRecords;
 }
